@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exercice Catégories</title>
+
+    <!-- 1) Charger Comic Neue VIA Google Fonts (mettre AVANT ton <style>) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        /* 2) ordre de fallback correct :
+         Comic Sans MS d'abord, si absent -> Comic Neue, si absent -> sans-serif */
+        font-family: "Comic Sans MS", "Comic Neue", sans-serif;
+        text-align: center;
+        background-color: #f0f8ff;
+        margin: 0;
+        padding: 0 10px;
+      }
+      h1 {
+        color: #2e8b57;
+        display: inline-block;
+        margin: 10px 0;
+      }
+      #next-button {
+        float: right;
+        margin: 20px 10px;
+        padding: 8px 15px;
+        font-size: 16px;
+        background-color: #2e8b57;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+      .category {
+        border: 2px dashed #2e8b57;
+        border-radius: 10px;
+        width: 30%;
+        min-height: 250px;
+        padding: 10px;
+        background-color: #e0f7fa;
+      }
+      .word {
+        background-color: #ffeb3b;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: grab;
+        display: inline-block;
+        font-size: 22px;
+      }
+      #word-bank {
+        margin-top: 20px;
+        min-height: 80px;
+      }
+      .score {
+        margin-top: 20px;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Les mots génériques et spécifiques</h1>
+    <button id="next-button">Suivant</button>
+
+    <div class="container" id="categories-container"></div>
+    <div id="word-bank"></div>
+
+    <div class="score">
+      <p>
+        Réussites : <span id="success">0</span> | Erreurs :
+        <span id="fail">0</span>
+      </p>
+    </div>
+
+    <script>
+      let successCount = 0;
+      let failCount = 0;
+
+      const allCategories = {
+        Animaux: [
+          "Chien",
+          "Chat",
+          "Lapin",
+          "Oiseau",
+          "Poisson",
+          "Tigre",
+          "Lion",
+          "Éléphant",
+          "Dauphin",
+          "Cheval",
+          "Souris",
+          "Serpent",
+        ],
+        Fruits: [
+          "Pomme",
+          "Banane",
+          "Orange",
+          "Fraise",
+          "Cerise",
+          "Poire",
+          "Raisin",
+          "Melon",
+          "Mangue",
+          "Citron",
+          "Ananas",
+          "Pêche",
+        ],
+        Sports: [
+          "Football",
+          "Basketball",
+          "Tennis",
+          "Natation",
+          "Cyclisme",
+          "Handball",
+          "Golf",
+          "Rugby",
+          "Boxe",
+          "Karaté",
+          "Volley",
+          "Ski",
+        ],
+        Transports: [
+          "Voiture",
+          "Avion",
+          "Train",
+          "Vélo",
+          "Bus",
+          "Bateau",
+          "Moto",
+          "Camion",
+          "Tram",
+          "Taxi",
+          "Montgolfière",
+          "Scooter",
+        ],
+        Métiers: [
+          "Médecin",
+          "Pompiers",
+          "Professeur",
+          "Boulanger",
+          "Dentiste",
+          "Chauffeur",
+          "Coiffeur",
+          "Artiste",
+          "Jardinier",
+          "Musicien",
+          "Policier",
+          "Pompier",
+        ],
+        Couleurs: [
+          "Rouge",
+          "Bleu",
+          "Jaune",
+          "Vert",
+          "Orange",
+          "Violet",
+          "Rose",
+          "Noir",
+          "Blanc",
+          "Gris",
+          "Marron",
+          "Turquoise",
+        ],
+        Vêtements: [
+          "T-shirt",
+          "Pantalon",
+          "Robe",
+          "Chapeau",
+          "Chaussures",
+          "Pull",
+          "Veste",
+          "Short",
+          "Bonnet",
+          "Gants",
+          "Écharpe",
+          "Sandales",
+        ],
+        Éléments: [
+          "Terre",
+          "Eau",
+          "Feu",
+          "Air",
+          "Glace",
+          "Pluie",
+          "Neige",
+          "Vent",
+          "Foudre",
+          "Soleil",
+          "Lune",
+          "Étoile",
+        ],
+        Instruments: [
+          "Piano",
+          "Guitare",
+          "Batterie",
+          "Violon",
+          "Flûte",
+          "Tambour",
+          "Saxophone",
+          "Harmonica",
+          "Clarinette",
+          "Trompette",
+          "Orgue",
+          "Ukulélé",
+        ],
+        Légumes: [
+          "Carotte",
+          "Tomate",
+          "Pomme de terre",
+          "Poivron",
+          "Concombre",
+          "Courgette",
+          "Salade",
+          "Épinard",
+          "Oignon",
+          "Brocoli",
+          "Aubergine",
+          "Chou",
+        ],
+        Émotions: [
+          "Joie",
+          "Tristesse",
+          "Colère",
+          "Peur",
+          "Surprise",
+          "Dégoût",
+          "Excitation",
+          "Ennui",
+          "Fierté",
+          "Honte",
+          "Curiosité",
+          "Amour",
+        ],
+        Corps: [
+          "Tête",
+          "Bras",
+          "Jambe",
+          "Main",
+          "Pied",
+          "Nez",
+          "Oreille",
+          "Bouche",
+          "Yeux",
+          "Cou",
+          "Épaule",
+          "Doigt",
+        ],
+        Fêtes: [
+          "Noël",
+          "Pâques",
+          "Halloween",
+          "Anniversaire",
+          "Nouvel an",
+          "Carnaval",
+          "Fête de la musique",
+          "Saint Valentin",
+          "Fête des mères",
+          "Fête des pères",
+          "Hanoucca",
+          "Diwali",
+        ],
+        Objets: [
+          "Table",
+          "Chaise",
+          "Lit",
+          "Ordinateur",
+          "Livre",
+          "Stylo",
+          "Téléphone",
+          "Sac",
+          "Télévision",
+          "Lampe",
+          "Montre",
+          "Clé",
+        ],
+        Pays: [
+          "France",
+          "Italie",
+          "Espagne",
+          "Allemagne",
+          "Portugal",
+          "Angleterre",
+          "Belgique",
+          "Suisse",
+          "Canada",
+          "Brésil",
+          "Chine",
+          "Japon",
+        ],
+        "Animaux marins": [
+          "Dauphin",
+          "Requin",
+          "Poisson clown",
+          "Étoile de mer",
+          "Pieuvre",
+          "Méduse",
+          "Crabe",
+          "Homard",
+          "Tortue",
+          "Raie",
+          "Orque",
+          "Moule",
+        ],
+        Oiseaux: [
+          "Aigle",
+          "Pigeon",
+          "Colibri",
+          "Perroquet",
+          "Moineau",
+          "Hibou",
+          "Canard",
+          "Cygne",
+          "Paon",
+          "Corbeau",
+          "Faucon",
+          "Mouette",
+        ],
+        Villes: [
+          "Paris",
+          "Londres",
+          "New York",
+          "Tokyo",
+          "Sydney",
+          "Rome",
+          "Berlin",
+          "Madrid",
+          "Moscou",
+          "Beijing",
+          "Rio",
+          "Le Caire",
+        ],
+        Boissons: [
+          "Eau",
+          "Lait",
+          "Jus d'orange",
+          "Thé",
+          "Café",
+          "Soda",
+          "Cacao",
+          "Smoothie",
+          "Bière",
+          "Vin",
+          "Citronnade",
+          "Champagne",
+        ],
+        Ustensiles: [
+          "Couteau",
+          "Fourchette",
+          "Cuillère",
+          "Poêle",
+          "Casserole",
+          "Mixeur",
+          "Spatule",
+          "Fouet",
+          "Passoire",
+          "Louche",
+          "Planche à découper",
+          "Grille-pain",
+        ],
+      };
+
+      function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+      }
+
+      function loadExercise() {
+        successCount = 0;
+        failCount = 0;
+        document.getElementById("success").textContent = successCount;
+        document.getElementById("fail").textContent = failCount;
+
+        const container = document.getElementById("categories-container");
+        container.innerHTML = "";
+        const wordBank = document.getElementById("word-bank");
+        wordBank.innerHTML = "";
+
+        const categoryNames = shuffle(Object.keys(allCategories)).slice(0, 3);
+
+        categoryNames.forEach((catName) => {
+          const div = document.createElement("div");
+          div.className = "category";
+          div.id = catName;
+          div.ondrop = drop;
+          div.ondragover = allowDrop;
+          const h3 = document.createElement("h3");
+          h3.textContent = catName;
+          div.appendChild(h3);
+          container.appendChild(div);
+        });
+
+        let wordsToPlace = [];
+        categoryNames.forEach((cat) => {
+          const shuffledWords = shuffle([...allCategories[cat]]);
+          wordsToPlace = wordsToPlace.concat(shuffledWords.slice(0, 5));
+        });
+        wordsToPlace = shuffle(wordsToPlace);
+
+        wordsToPlace.forEach((wordText) => {
+          const div = document.createElement("div");
+          div.className = "word";
+          div.id = wordText.replace(/\s+/g, "_");
+          div.textContent = wordText;
+          div.draggable = true;
+          div.ondragstart = drag;
+          wordBank.appendChild(div);
+        });
+      }
+
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+      }
+      function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const word = document.getElementById(data);
+        const targetCategory = ev.target.closest(".category").id;
+        ev.target.closest(".category").appendChild(word);
+
+        if (allCategories[targetCategory].includes(word.textContent)) {
+          word.style.backgroundColor = "#90ee90";
+          successCount++;
+        } else {
+          word.style.backgroundColor = "#ff6347";
+          failCount++;
+        }
+        document.getElementById("success").textContent = successCount;
+        document.getElementById("fail").textContent = failCount;
+      }
+
+      document
+        .getElementById("next-button")
+        .addEventListener("click", loadExercise);
+      loadExercise();
+    </script>
+  </body>
+</html>
